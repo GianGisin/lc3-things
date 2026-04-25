@@ -21,14 +21,18 @@ public class Memory {
         this();
         byte[] data = in.readAllBytes();
         log.info(data.length + " bytes read from input file");
+        String s1 = String.format("%8s", Integer.toBinaryString(data[0] & 0xFF)).replace(' ', '0');
+        String s2 = String.format("%8s", Integer.toBinaryString(data[1] & 0xFF)).replace(' ', '0');
+        int start = Integer.parseInt(s1+s2, 2); 
         // FIXME: proper handling
-        assert data.length <= 2 * MEM_SIZE;
+        assert data.length - start <= 2 * MEM_SIZE;
         String prev = "";
-        for (int i = 0; i < data.length; i++) {
+        for (int i = 2; i < data.length; i++) {
+            int j = i - 2;
             log.info(data[i] + "");
             if (i % 2 == 1) {
                 String curr = String.format("%8s", Integer.toBinaryString(data[i] & 0xFF)).replace(' ', '0');
-                memArray[i / 2] = (short) Integer.parseInt(prev + curr, 2);
+                memArray[j / 2 + start] = (short) Integer.parseInt(prev + curr, 2);
             } else {
                 prev = String.format("%8s", Integer.toBinaryString(data[i] & 0xFF)).replace(' ', '0');
             }
