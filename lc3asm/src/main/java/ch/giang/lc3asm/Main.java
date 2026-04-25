@@ -1,4 +1,4 @@
-package ch.giang;
+package ch.giang.lc3asm;
 
 import java.util.Arrays;
 
