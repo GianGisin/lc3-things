@@ -43,7 +43,7 @@ public class Instruction {
     }
 
     public short DR() {
-        return Short.parseShort(bits.substring(4, 7));
+        return Short.parseShort(bits.substring(4, 7), 2);
     }
 
     public short SR() {
