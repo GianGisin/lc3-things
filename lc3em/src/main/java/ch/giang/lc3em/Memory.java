@@ -49,8 +49,11 @@ public class Memory {
     }
 
     public short getShort(short address) {
+        // TODO: handle access to memor mapped IO
         // TODO: check that this is consistent with memory offset calculations
-        return memArray[Short.toUnsignedInt(address)];
+        int abs_address = Short.toUnsignedInt(address);
+        if(abs_address >= 0xFE00) throw new NotImplementedException("Memory-mapped IO is not yet implemented");
+        return memArray[abs_address];
     }
 
     public Instruction getInstruction(short address) {
