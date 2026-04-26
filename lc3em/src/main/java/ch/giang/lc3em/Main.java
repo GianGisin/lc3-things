@@ -12,7 +12,8 @@ public class Main {
             InputStream in = new FileInputStream(args[0]);
             Memory mem = new Memory(in);
             in.close();
-            CPU cpu = new CPU(mem, 0);
+            // FIXME: where does the initial PC come from?
+            CPU cpu = new CPU(mem, (short)0x3000);
             cpu.step();
         }
 

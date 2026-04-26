@@ -1,7 +1,7 @@
 package ch.giang.lc3em;
 
 public class Instruction {
-    public opCode op;
+    public final opCode op;
     private String bits;
 
     public Instruction(String bits) {
