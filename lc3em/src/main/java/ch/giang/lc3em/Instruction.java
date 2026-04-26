@@ -66,9 +66,14 @@ public class Instruction {
         return bit(9);
     }
 
+    public boolean jumpMode(){
+        return bit(11);
+    }
+
     public boolean bit(int index) {
         return bits.charAt(15 - index) == '1';
     }
+
 
     static opCode opCodeFromBits(String bits) {
         // FIXME: opcode.values takes O(n) because it copies the array
