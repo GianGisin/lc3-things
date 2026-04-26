@@ -25,4 +25,10 @@ public class InstructionTest {
         Assert.assertEquals(ins.op, opCode.RTI);
     }
 
+    @Test
+    public void getBits(){
+        Instruction inst = new Instruction("0001000100100010");
+        Assert.assertTrue(inst.bit(12) && inst.bit(1) && inst.bit(5) && inst.bit(8));
+    }
+
 }
