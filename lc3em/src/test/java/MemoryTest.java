@@ -50,7 +50,8 @@ public class MemoryTest {
     public void shortCalc() throws IOException {
         Memory mem = memFrom(new byte[] { (byte) 0xF0, 0x00, 0x00, 0x01, 0x00, 0x02 });
         Assert.assertEquals(2, mem.getShort((short) (0xF000 + 0x0001)));
-        Assert.assertEquals(1, mem.getShort((short) (0xF001 - 0x0001)));
+        Assert.assertEquals(1, mem.getShort((short) (0xF001 - 0x0001))); 
+        Assert.assertEquals(1, mem.getShort((short) (0xF001 + 0xFFFF))); // equivalent to - 1
         // TODO: more testing
     }
 
