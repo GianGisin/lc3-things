@@ -13,7 +13,7 @@ public enum opCode {
     NOT, // 1001 9
     LDI, // 1010 10
     STI, // 1011 11
-    RET, // 1100 12
+    JMP, // 1100 12
     ILLEGAL, // 1101 13
     LEA, // 1110 14
     TRAP, // 1111 15
