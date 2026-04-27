@@ -36,18 +36,13 @@ public class CPU {
     }
 
     private void setConditionCodes(short s) {
+        Z = P = N = false;
         if (s < 0) {
-            Z = false;
-            P = false;
             N = true;
         } else if (s > 0) {
-            Z = false;
             P = true;
-            N = false;
         } else {
             Z = true;
-            P = false;
-            N = false;
         }
     }
 
@@ -81,6 +76,7 @@ public class CPU {
         short imm5 = inst.Imm5();
         int pcoffset9 = inst.PCOffset9();
         short BaseR = inst.BaseR();
+
         switch (inst.op) {
             case opCode.BR:
                 if ((inst.n() && N) || (inst.z() && Z) || (inst.p() && P)) {
