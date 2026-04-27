@@ -53,16 +53,17 @@ public class CPU {
 
     /***
      * Sign extends given bitstring and returns short
+     * 
      * @param s bitstring with length at most 15
      * @return short containing extended value
      */
-    public static short sext(String s){
+    public static short sext(String s) {
         char extWith;
-        if(s.charAt(0) == '1'){
+        if (s.charAt(0) == '1') {
             // sext with 1s
             extWith = '1';
         } else {
-            //sext with 0s
+            // sext with 0s
             extWith = '0';
         }
         String extended = String.format("%16s", s).replace(' ', extWith);
@@ -72,13 +73,19 @@ public class CPU {
     public void step() {
         // FETCH
         Instruction inst = mem.getInstruction(PC);
+        PC++;
         // DECODE
         short s1 = inst.SR1();
         short s2 = inst.SR2();
         short DR = inst.DR();
         short imm5 = inst.Imm5();
+        int pcoffset9 = inst.PCOffset9();
+        short BaseR = inst.BaseR();
         switch (inst.op) {
             case opCode.BR:
+                if ((inst.n() && N) || (inst.z() && Z) || (inst.p() && P)) {
+                    PC += pcoffset9;
+                }
                 break;
             case opCode.ADD:
                 short sum;
@@ -119,7 +126,8 @@ public class CPU {
                 break;
             case opCode.STI:
                 break;
-            case opCode.RET:
+            case opCode.JMP:
+                PC = BaseR;
                 break;
             case opCode.ILLEGAL:
                 break;
@@ -129,10 +137,6 @@ public class CPU {
                 break;
 
         }
-        // EVALUATE ADRESS
-        // FETCH OPERANDS
-        // EXECUTE
-        // WRITEBACK
 
     }
 
