@@ -13,7 +13,7 @@ public class Main {
             Memory mem = new Memory(in);
             in.close();
             // FIXME: where does the initial PC come from?
-            CPU cpu = new CPU(mem, (short)0x3000);
+            CPU cpu = new CPU(mem, (short) 0x3000);
             cpu.step();
         }
 

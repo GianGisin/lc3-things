@@ -65,6 +65,10 @@ public class CPU {
         return (short) Integer.parseInt(extended, 2);
     }
 
+    public static boolean getBit(int index, short value) {
+        return (value >>> index) % 2 == 0 ? false : true;
+    }
+
     public void step() {
         // FETCH
         Instruction inst = mem.getInstruction(PC);
@@ -95,6 +99,7 @@ public class CPU {
                 break;
 
             case opCode.LD:
+                // check for access violation
                 break;
             case opCode.ST:
                 break;
