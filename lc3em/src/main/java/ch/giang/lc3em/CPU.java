@@ -24,27 +24,73 @@ public class CPU {
 
     }
 
-    public void setClockPeriod(long value) {
-        clockPeriod = value;
-        throttleClock = clockPeriod <= 0 ? false : true;
-    }
-
     public CPU(Memory mem, short PCInit, long clockPeriod) {
         this(mem, PCInit);
         this.clockPeriod = clockPeriod;
         throttleClock = true;
     }
 
+    public void setClockPeriod(long value) {
+        clockPeriod = value;
+        throttleClock = clockPeriod <= 0 ? false : true;
+    }
+
+    private void setConditionCodes(short s) {
+        if (s < 0) {
+            Z = false;
+            P = false;
+            N = true;
+        } else if (s > 0) {
+            Z = false;
+            P = true;
+            N = false;
+        } else {
+            Z = true;
+            P = false;
+            N = false;
+        }
+    }
+
+    /***
+     * Sign extends given bitstring and returns short
+     * @param s bitstring with length at most 15
+     * @return short containing extended value
+     */
+    public static short sext(String s){
+        char extWith;
+        if(s.charAt(0) == '1'){
+            // sext with 1s
+            extWith = '1';
+        } else {
+            //sext with 0s
+            extWith = '0';
+        }
+        String extended = String.format("%16s", s).replace(' ', extWith);
+        return (short) Integer.parseInt(extended, 2);
+    }
+
     public void step() {
         // FETCH
         Instruction inst = mem.getInstruction(PC);
         // DECODE
+        short s1 = inst.SR1();
+        short s2 = inst.SR2();
+        short DR = inst.DR();
+        short imm5 = inst.Imm5();
         switch (inst.op) {
-
             case opCode.BR:
                 break;
             case opCode.ADD:
+                short sum;
+                if (inst.immBit()) {
+                    sum = (short) (s1 + imm5);
+                } else {
+                    sum = (short) (s1 + s2);
+                }
+                setConditionCodes(sum);
+                RF[DR] = sum;
                 break;
+
             case opCode.LD:
                 break;
             case opCode.ST:
@@ -52,6 +98,14 @@ public class CPU {
             case opCode.JSR:
                 break;
             case opCode.AND:
+                short res;
+                if (inst.immBit()) {
+                    res = (short) (s1 & imm5);
+                } else {
+                    res = (short) (s1 & s2);
+                }
+                setConditionCodes(res);
+                RF[DR] = res;
                 break;
             case opCode.LDR:
                 break;
