@@ -66,7 +66,7 @@ public class CPU {
     }
 
     public static boolean getBit(int index, short value) {
-        return (value >>> index) % 2 == 0 ? false : true;
+        return ((value >>> index) & 1) == 0 ? false : true;
     }
 
     public void step() {
