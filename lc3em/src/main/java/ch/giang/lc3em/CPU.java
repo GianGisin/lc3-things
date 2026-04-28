@@ -69,6 +69,16 @@ public class CPU {
         return ((value >>> index) & 1) == 0 ? false : true;
     }
 
+    public boolean checkAccess(short address) {
+        if (getBit(15, PSR)) {
+            // we are in user mode, check if the address is in kernel memory
+            // (system space) (I/O Page)
+            if (address < 0x3000 || (address <= -1 && address >= -512))
+                return false;
+        }
+        return true;
+    }
+
     public void step() {
         // FETCH
         Instruction inst = mem.getInstruction(PC);
@@ -78,7 +88,7 @@ public class CPU {
         short s2 = inst.SR2();
         short DR = inst.DR();
         short imm5 = inst.Imm5();
-        int pcoffset9 = inst.PCOffset9();
+        short pcoffset9 = inst.PCOffset9();
         short BaseR = inst.BaseR();
 
         switch (inst.op) {
@@ -87,6 +97,7 @@ public class CPU {
                     PC += pcoffset9;
                 }
                 break;
+
             case opCode.ADD:
                 short sum;
                 if (inst.immBit()) {
@@ -100,9 +111,27 @@ public class CPU {
 
             case opCode.LD:
                 // check for access violation
+                short newaddr = (short) (PC + pcoffset9);
+                if (checkAccess(newaddr)) {
+                    RF[DR] = mem.getShort(newaddr);
+                    setConditionCodes(RF[DR]);
+                } else {
+                    System.out.println("Access Control Violation at PC " + PC);
+                    // TODO: Initiate ACV exception
+                }
                 break;
+
             case opCode.ST:
+                // check for access violation
+                newaddr = (short) (PC + pcoffset9);
+                if (checkAccess(newaddr)) {
+                    mem.set(newaddr, RF[DR]);
+                } else {
+                    System.out.println("Access Control Violation at PC " + PC);
+                    // TODO: Initiate ACV exception
+                }
                 break;
+
             case opCode.JSR:
                 break;
             case opCode.AND:
@@ -124,6 +153,15 @@ public class CPU {
             case opCode.NOT:
                 break;
             case opCode.LDI:
+                short pointer = (short) (PC + pcoffset9);
+                newaddr = mem.getShort(pointer);
+                if (checkAccess(newaddr) && checkAccess(pointer)) {
+                    RF[DR] = mem.getShort(newaddr);
+                    setConditionCodes(RF[DR]);
+                } else {
+                    System.out.println("Access Control Violation at PC " + PC);
+                    // TODO: Initiate ACV exception
+                }
                 break;
             case opCode.STI:
                 break;
