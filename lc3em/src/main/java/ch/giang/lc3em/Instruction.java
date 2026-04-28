@@ -11,20 +11,20 @@ public class Instruction {
     }
 
     // offset literals
-    public int PCOffset9() {
+    public short PCOffset9() {
         return CPU.sext(bits.substring(7));
     }
 
-    public int PCOffset11() {
+    public short PCOffset11() {
         return CPU.sext(bits.substring(5));
     }
 
-    public int Offset6() {
+    public short Offset6() {
         return CPU.sext(bits.substring(10));
     }
 
-    public int Trapvect8() {
-        return Integer.parseInt(bits.substring(8), 2);
+    public short Trapvect8() {
+        return (short) Integer.parseInt(bits.substring(8), 2);
     }
 
     // immediate for and + add
