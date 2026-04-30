@@ -21,4 +21,6 @@ public class CPUTest {
         }
     }
 
+    // TODO: test checkAccess
+
 }
