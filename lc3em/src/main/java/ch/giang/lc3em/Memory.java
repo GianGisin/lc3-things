@@ -23,7 +23,7 @@ public class Memory {
         log.info(data.length + " bytes read from input file");
         String s1 = String.format("%8s", Integer.toBinaryString(data[0] & 0xFF)).replace(' ', '0');
         String s2 = String.format("%8s", Integer.toBinaryString(data[1] & 0xFF)).replace(' ', '0');
-        int start = Integer.parseInt(s1+s2, 2); 
+        int start = Integer.parseInt(s1 + s2, 2);
         // FIXME: proper handling
         assert data.length - start <= 2 * MEM_SIZE;
         String prev = "";
@@ -43,7 +43,6 @@ public class Memory {
     }
 
     public boolean set(short address, short value) {
-        // TODO: check privilege level
         memArray[Short.toUnsignedInt(address)] = value;
         return true;
     }
@@ -52,7 +51,8 @@ public class Memory {
         // TODO: handle access to memor mapped IO
         // TODO: check that this is consistent with memory offset calculations
         int abs_address = Short.toUnsignedInt(address);
-        if(abs_address >= 0xFE00) throw new NotImplementedException("Memory-mapped IO is not yet implemented");
+        if (abs_address >= 0xFE00)
+            throw new NotImplementedException("Memory-mapped IO is not yet implemented");
         return memArray[abs_address];
     }
 

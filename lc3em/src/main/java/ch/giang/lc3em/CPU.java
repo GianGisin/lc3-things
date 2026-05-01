@@ -5,6 +5,8 @@ public class CPU {
     private short PC; // program counter
     private short MCR; // machine control register (clock enable)
     private short PSR; // processor status register
+    private short saved_ssp; // saved stack pointers
+    private short saved_usp;
     private boolean N; // condition codes
     private boolean Z;
     private boolean P;
@@ -21,7 +23,6 @@ public class CPU {
         MCR = 0x80; // enable clock
         PSR = 0x80; // set processor to user mode, priority 0
         N = Z = P = false;
-
     }
 
     public CPU(Memory mem, short PCInit, long clockPeriod) {
@@ -46,6 +47,26 @@ public class CPU {
         }
     }
 
+    public void initiateException(LC3Exception e) {
+        short temp = PSR;
+        if (getBit(15, PSR)) { // process causing exception was in user mode
+            PSR = flipBit(15, PSR);
+            saved_usp = RF[6];
+            RF[6] = saved_ssp;
+        }
+        // push temp and pc on system stack
+        RF[6]--;
+        mem.set(RF[6], temp);
+        RF[6]--;
+        mem.set(RF[6], PC);
+        short exCode = (short) e.ordinal();
+        short tableAddr = (short) (exCode + 0x0100);
+        // 0x0100 priv mode
+        // 0x0101 illegal opCode
+        // 0x0102 access control violation
+        PC = mem.getShort(tableAddr);
+    }
+
     /***
      * Sign extends given bitstring and returns short
      * 
@@ -66,7 +87,20 @@ public class CPU {
     }
 
     public static boolean getBit(int index, short value) {
+        if (index >= 16 || index < 0)
+            throw new IllegalArgumentException();
         return ((value >>> index) & 1) == 0 ? false : true;
+    }
+
+    public static short flipBit(int index, short value) {
+        if (index >= 16 || index < 0)
+            throw new IllegalArgumentException();
+        short power = (short) Math.pow(2, index);
+        if (getBit(index, value)) {
+            return (short) (value - power);
+        } else {
+            return (short) (value + power);
+        }
     }
 
     public boolean checkAccess(short address) {
@@ -134,7 +168,7 @@ public class CPU {
                     setConditionCodes(RF[DR]);
                 } else {
                     System.out.println("Access Control Violation at PC " + PC);
-                    // TODO: Initiate ACV exception
+                    initiateException(LC3Exception.AccesControlViolation);
                 }
                 break;
 
@@ -145,7 +179,7 @@ public class CPU {
                     mem.set(newaddr, RF[DR]);
                 } else {
                     System.out.println("Access Control Violation at PC " + PC);
-                    // TODO: Initiate ACV exception
+                    initiateException(LC3Exception.AccesControlViolation);
                 }
                 break;
 
@@ -157,7 +191,7 @@ public class CPU {
                     setConditionCodes(RF[DR]);
                 } else {
                     System.out.println("Access Control Violation at PC " + PC);
-                    // TODO: Initiate ACV exception
+                    initiateException(LC3Exception.AccesControlViolation);
                 }
                 break;
 
@@ -169,7 +203,7 @@ public class CPU {
                     setConditionCodes(RF[DR]);
                 } else {
                     System.out.println("Access Control Violation at PC " + PC);
-                    // TODO: Initiate ACV exception
+                    initiateException(LC3Exception.AccesControlViolation);
                 }
                 break;
 
@@ -180,7 +214,7 @@ public class CPU {
                     setConditionCodes(RF[DR]);
                 } else {
                     System.out.println("Access Control Violation at PC " + PC);
-                    // TODO: Initiate ACV exception
+                    initiateException(LC3Exception.AccesControlViolation);
                 }
                 break;
 
@@ -191,7 +225,7 @@ public class CPU {
                     setConditionCodes(RF[DR]);
                 } else {
                     System.out.println("Access Control Violation at PC " + PC);
-                    // TODO: Initiate ACV exception
+                    initiateException(LC3Exception.AccesControlViolation);
                 }
                 break;
 
@@ -211,6 +245,35 @@ public class CPU {
                 break;
 
             case opCode.RTI:
+                if (getBit(15, PSR)) {
+                    initiateException(LC3Exception.PrivilegeModeViolation);
+                } else {
+                    PC = mem.getShort(RF[6]); // load PC from system stack
+                    RF[6]++;
+                    temp = mem.getShort(RF[6]);
+                    RF[6]++;
+                    PSR = temp;
+                    if (getBit(15, PSR)) { // dropping back to user mode? switch to user stack.
+                        saved_ssp = RF[6];
+                        RF[6] = saved_usp;
+                    }
+                }
+                break;
+
+            case opCode.TRAP:
+                temp = PSR;
+                if (getBit(15, PSR)) {
+                    saved_usp = RF[6];
+                    RF[6] = saved_ssp;
+                    PSR = flipBit(15, PSR);
+                }
+                // push temp, pc on sys stack
+                RF[6]--;
+                mem.set(RF[6], temp);
+                RF[6]--;
+                mem.set(RF[6], PC);
+
+                PC = mem.getShort(inst.Trapvect8());
                 break;
 
             case opCode.JMP:
@@ -218,12 +281,9 @@ public class CPU {
                 break;
 
             case opCode.ILLEGAL:
+                initiateException(LC3Exception.IllegalOpcodeException);
                 break;
-            case opCode.TRAP:
-                break;
-
         }
-
     }
 
     public void run() {
@@ -238,7 +298,5 @@ public class CPU {
                 }
             }
         }
-
     }
-
 }
