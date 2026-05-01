@@ -10,7 +10,7 @@ public class InstructionTest {
         Instruction inst2 = new Instruction("0000101011011101");
         Assert.assertEquals(inst2.DR(), 5);
         Assert.assertEquals(inst2.SR1(), 3);
-        Assert.assertEquals(inst2.Imm5(), 29);
+        Assert.assertEquals(inst2.Imm5(), -3);
         Assert.assertEquals(inst2.SR2(), 5);
         Assert.assertEquals(inst2.n(), true);
         Assert.assertEquals(inst2.z(), false);
