@@ -1,3 +1,8 @@
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -37,13 +42,38 @@ public class CPUTest {
         Assert.assertEquals(false, c.checkAccess((short) 0xFFFF)); // -1
     }
 
-    // TODO: test flipBit
     @Test
     public void testFlipBit(){
         Assert.assertEquals(32, CPU.flipBit(5,(short) 0));
         Assert.assertEquals(0, CPU.flipBit(5,(short) 32));
         Assert.assertEquals(-32768, CPU.flipBit(15,(short) 0));
         Assert.assertEquals(29612, CPU.flipBit(15,(short) 0xF3AC));
+    }
+
+    @Test
+    public void testProgrammAdd() throws FileNotFoundException, IOException{
+        // Assert.assertEquals("", System.getProperty("user.dir"));
+        InputStream in = new FileInputStream("src/test/resources/add.obj");
+        Memory mem = new Memory(in);
+        in.close();
+        for(int i = 0; i < 10; i++){
+            System.out.println(mem.getBits((short)(0x3000 + i)));
+        }
+        CPU cpu = new CPU(mem, (short) 0x3000);
+        Assert.assertEquals(8708, mem.getShort((short)0x3000)); // fist instruction at correct location
+        cpu.step();
+        Assert.assertEquals(6, cpu.register(1)); // first load
+        Assert.assertEquals(1, cpu.condition());
+        cpu.step();
+        Assert.assertEquals(7, cpu.register(2)); // second load
+        Assert.assertEquals(1, cpu.condition());
+        cpu.step();
+        Assert.assertEquals(13, cpu.register(3)); // add
+        Assert.assertEquals(1, cpu.condition());
+        cpu.step();
+        Assert.assertEquals(13, mem.getShort((short) (0x3000 + 7))); //store
+        cpu.step();
+        Assert.assertEquals(6, cpu.register(1));
     }
 
 }
