@@ -53,14 +53,26 @@ public class CPU {
         return P? 1: (N? -1:0);
     }
 
-    private void setConditionCodes(short s) {
+    public short getPSR(){
+        return PSR;
+    }
+
+    public void setConditionCodes(short s) {
         Z = P = N = false;
+        
+        // clear the condition codes from PSR in the worst possible way
+        PSR >>= 3; 
+        PSR <<= 3;
+
         if (s < 0) {
             N = true;
+            PSR = flipBit(2, PSR);
         } else if (s > 0) {
             P = true;
+            PSR = flipBit(0, PSR);
         } else {
             Z = true;
+            PSR = flipBit(1, PSR);
         }
     }
 

@@ -51,8 +51,31 @@ public class CPUTest {
     }
 
     @Test
+    public void testPSRCCcoherence(){
+        CPU c = new CPU(new Memory(), (short)0);
+        c.setConditionCodes((short)0);
+        Assert.assertEquals(0, c.condition());
+        Assert.assertEquals(true, CPU.getBit(1, c.getPSR()));
+        Assert.assertEquals(false, CPU.getBit(2, c.getPSR()));
+        Assert.assertEquals(false, CPU.getBit(0, c.getPSR()));
+
+        c.setConditionCodes((short)-1);
+        Assert.assertEquals(-1, c.condition());
+        Assert.assertEquals(false, CPU.getBit(1, c.getPSR()));
+        Assert.assertEquals(true, CPU.getBit(2, c.getPSR()));
+        Assert.assertEquals(false, CPU.getBit(0, c.getPSR()));
+
+        c.setConditionCodes((short)1);
+        Assert.assertEquals(1, c.condition());
+        Assert.assertEquals(false, CPU.getBit(1, c.getPSR()));
+        Assert.assertEquals(false, CPU.getBit(2, c.getPSR()));
+        Assert.assertEquals(true, CPU.getBit(0, c.getPSR()));
+
+
+    }
+
+    @Test
     public void testProgrammAdd() throws FileNotFoundException, IOException{
-        // Assert.assertEquals("", System.getProperty("user.dir"));
         InputStream in = new FileInputStream("src/test/resources/add.obj");
         Memory mem = new Memory(in);
         in.close();
