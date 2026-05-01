@@ -69,7 +69,21 @@ public class Memory {
     private static String shortToBitstring(short word) {
         String bits = Integer.toBinaryString(Short.toUnsignedInt(word));
         return String.format("%16s", bits).replace(' ', '0');
+    }
 
+    private static String shortToHex(short word){
+        String hex = Integer.toHexString(Short.toUnsignedInt(word));
+        return String.format("%4s", hex).replace(' ', '0');
+    }
+
+    public String repr(int start, int end){
+        String res = "";
+        short value;
+        for(int i = start; i <= end; i++){
+            value = getShort((short)i);
+            res += shortToHex((short)i) + "  " + shortToBitstring(value) + "  " + shortToHex(value) + "  " + value + "\n"; 
+        }
+        return res;
     }
 
 }

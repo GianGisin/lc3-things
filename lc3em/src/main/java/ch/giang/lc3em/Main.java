@@ -20,11 +20,8 @@ public class Main {
                 s.nextLine();
                 // TODO: add a nice way to print memory: table with index, value hex bin dec
                 cpu.step();
-                for (int i = 0; i < 10; i++) {
-                    System.out.println(mem.getBits((short) (0x3000 + i)));
-                }
+                System.out.println(mem.repr((short) 0x3000, (short) 0x300A));
                 System.out.println(cpu.regsToString());
-
             }
         }
 
