@@ -110,6 +110,22 @@ public class CPU {
                 RF[DR] = sum;
                 break;
 
+            case opCode.AND:
+                short res;
+                if (inst.immBit()) {
+                    res = (short) (s1 & imm5);
+                } else {
+                    res = (short) (s1 & s2);
+                }
+                setConditionCodes(res);
+                RF[DR] = res;
+                break;
+
+            case opCode.NOT:
+                RF[DR] = (short) ~RF[s1];
+                setConditionCodes(RF[DR]);
+                break;
+
             case opCode.LD:
                 // check for access violation
                 short newaddr = (short) (PC + pcoffset9);
@@ -167,6 +183,7 @@ public class CPU {
                     // TODO: Initiate ACV exception
                 }
                 break;
+
             case opCode.STR:
                 newaddr = (short) (RF[BaseR] + offset6);
                 if (checkAccess(newaddr)) {
@@ -178,28 +195,29 @@ public class CPU {
                 }
                 break;
 
+            case opCode.LEA:
+                RF[DR] = (short) (PC + pcoffset9);
+                break;
+
             case opCode.JSR:
-                break;
-            case opCode.AND:
-                short res;
-                if (inst.immBit()) {
-                    res = (short) (s1 & imm5);
+                boolean offsetMode = inst.jumpMode();
+                short temp = PC;
+                if (offsetMode) {
+                    PC += inst.PCOffset11();
                 } else {
-                    res = (short) (s1 & s2);
+                    PC = RF[BaseR];
                 }
-                setConditionCodes(res);
-                RF[DR] = res;
+                RF[7] = temp;
                 break;
+
             case opCode.RTI:
                 break;
-            case opCode.NOT:
-                break;
+
             case opCode.JMP:
                 PC = BaseR;
                 break;
+
             case opCode.ILLEGAL:
-                break;
-            case opCode.LEA:
                 break;
             case opCode.TRAP:
                 break;
