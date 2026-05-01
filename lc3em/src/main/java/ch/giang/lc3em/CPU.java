@@ -36,6 +36,23 @@ public class CPU {
         throttleClock = clockPeriod <= 0 ? false : true;
     }
 
+    public String regsToString() {
+        String res = "PC: " + PC + " ";
+        for (int i = 0; i < RF.length; i++) {
+            res += "R" + i + ":" + RF[i] + " ";
+        }
+        res += "\nusp: " + saved_usp + " ssp: " + saved_ssp + " NZP: " + (N ? "N":(Z? "Z":"P"));
+        return res;
+    }
+
+    public short register(int index){
+        return RF[index];
+    }
+
+    public int condition(){
+        return P? 1: (N? -1:0);
+    }
+
     private void setConditionCodes(short s) {
         Z = P = N = false;
         if (s < 0) {
@@ -107,7 +124,7 @@ public class CPU {
         if (getBit(15, PSR)) {
             // we are in user mode, check if the address is in kernel memory
             // (system space) (I/O Page)
-            if ((address >=0 && address < 0x3000) || (address <= -1 && address >= -512))
+            if ((address >= 0 && address < 0x3000) || (address <= -1 && address >= -512))
                 return false;
         }
         return true;
@@ -126,6 +143,7 @@ public class CPU {
         short offset6 = inst.Offset6();
         short BaseR = inst.BaseR();
 
+        System.out.println("Processing: " + inst.op);
         switch (inst.op) {
             case opCode.BR:
                 if ((inst.n() && N) || (inst.z() && Z) || (inst.p() && P)) {
@@ -136,9 +154,9 @@ public class CPU {
             case opCode.ADD:
                 short sum;
                 if (inst.immBit()) {
-                    sum = (short) (s1 + imm5);
+                    sum = (short) (RF[s1] + imm5);
                 } else {
-                    sum = (short) (s1 + s2);
+                    sum = (short) (RF[s1] + RF[s2]);
                 }
                 setConditionCodes(sum);
                 RF[DR] = sum;
