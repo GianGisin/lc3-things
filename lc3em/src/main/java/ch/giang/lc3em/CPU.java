@@ -20,8 +20,8 @@ public class CPU {
         this.mem = mem;
         PC = PCInit;
         RF = new short[8];
-        MCR = 0x80; // enable clock
-        PSR = 0x80; // set processor to user mode, priority 0
+        MCR = (short) 0x8000; // enable clock
+        PSR = (short) 0x8000; // set processor to user mode, priority 0
         N = Z = P = false;
     }
 
@@ -107,7 +107,7 @@ public class CPU {
         if (getBit(15, PSR)) {
             // we are in user mode, check if the address is in kernel memory
             // (system space) (I/O Page)
-            if (address < 0x3000 || (address <= -1 && address >= -512))
+            if ((address >=0 && address < 0x3000) || (address <= -1 && address >= -512))
                 return false;
         }
         return true;
