@@ -41,27 +41,35 @@ public class CPU {
         for (int i = 0; i < RF.length; i++) {
             res += "R" + i + ":" + RF[i] + " ";
         }
-        res += "\nusp: " + saved_usp + " ssp: " + saved_ssp + " NZP: " + (N ? "N":(Z? "Z":"P"));
+        res += "\nusp: " + saved_usp + " ssp: " + saved_ssp + " NZP: " + (N ? "N" : (Z ? "Z" : "P"));
         return res;
     }
 
-    public short register(int index){
+    public short register(int index) {
         return RF[index];
     }
 
-    public int condition(){
-        return P? 1: (N? -1:0);
+    public void setRegister(int index, short value) {
+        RF[index] = value;
     }
 
-    public short getPSR(){
+    public short getPC(){
+        return PC;
+    }
+
+    public int condition() {
+        return P ? 1 : (N ? -1 : 0);
+    }
+
+    public short getPSR() {
         return PSR;
     }
 
     public void setConditionCodes(short s) {
         Z = P = N = false;
-        
+
         // clear the condition codes from PSR in the worst possible way
-        PSR >>= 3; 
+        PSR >>= 3;
         PSR <<= 3;
 
         if (s < 0) {
@@ -177,9 +185,9 @@ public class CPU {
             case opCode.AND:
                 short res;
                 if (inst.immBit()) {
-                    res = (short) (s1 & imm5);
+                    res = (short) (RF[s1] & imm5);
                 } else {
-                    res = (short) (s1 & s2);
+                    res = (short) (RF[s1] & RF[s2]);
                 }
                 setConditionCodes(res);
                 RF[DR] = res;
@@ -307,12 +315,18 @@ public class CPU {
                 break;
 
             case opCode.JMP:
-                PC = BaseR;
+                PC = RF[BaseR];
                 break;
 
             case opCode.ILLEGAL:
                 initiateException(LC3Exception.IllegalOpcodeException);
                 break;
+        }
+    }
+
+    public void step(int n) {
+        for (int i = 0; i < n; i++) {
+            step();
         }
     }
 

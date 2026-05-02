@@ -17,14 +17,14 @@ public class Main {
             CPU cpu = new CPU(mem, (short) 0x3000);
             Scanner s = new Scanner(System.in);
             while (true) {
-                s.nextLine();
-                // TODO: add a nice way to print memory: table with index, value hex bin dec
+                String l = s.nextLine();
+                if (l.startsWith("q"))
+                    break;
                 cpu.step();
                 System.out.println(mem.repr((short) 0x3000, (short) 0x300A));
                 System.out.println(cpu.regsToString());
             }
+            s.close();
         }
-
     }
-
 }
