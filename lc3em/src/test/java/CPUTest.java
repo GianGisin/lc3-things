@@ -235,4 +235,88 @@ public class CPUTest {
 
     }
 
+    @Test
+    public void testJmp() {
+        Memory mem = memFactory((short) 0x3000, new String[] {
+                "1100000010000000", // JMP R2
+        });
+        CPU c = new CPU(mem, (short) 0x3000);
+        c.setRegister(2, (short) 10025);
+        c.step();
+        Assert.assertEquals(c.getPC(), (short) 10025);
+    }
+
+    @Test
+    public void testBR() {
+        Memory mem = memFactory((short) 0x3000, new String[] {
+                "0000101111111011", // BRp -5
+        });
+        CPU c = new CPU(mem, (short) 0x3000);
+        c.setConditionCodes((short) -1);
+        c.step();
+        Assert.assertEquals(c.getPC(), (short) 0x2FFC);
+
+    }
+
+    @Test
+    public void testJsr() {
+        // also test JSRR
+
+    }
+
+    @Test
+    public void testLea() {
+
+    }
+
+    @Test
+    public void testTrap() {
+
+    }
+
+    @Test
+    public void testRti() {
+
+    }
+
+    // TODO: add accessControl tests
+    @Test
+    public void testSt() {
+        Memory mem = memFactory((short) 0x3000, new String[] {
+                "0011010000000011", // ST R2, 3
+        });
+        CPU c = new CPU(mem, (short) 0x3000);
+        c.setRegister(2, (short) 123);
+        c.step();
+        Assert.assertEquals(123, mem.getShort((short) 0x3004));
+
+    }
+
+    @Test
+    public void testSti() {
+        Memory mem = memFactory((short) 0x3000, new String[] {
+                "1011010000000011", // STI R2, 3
+                "0000000000000000",
+                "0000000000000000",
+                "0000000000000000",
+                "0101111100000010", // address 0x5F02
+        });
+        CPU c = new CPU(mem, (short) 0x3000);
+        c.setRegister(2, (short) -123);
+        c.step();
+        Assert.assertEquals(-123, mem.getShort((short) 0x5F02));
+    }
+
+    @Test
+    public void testStr() {
+        Memory mem = memFactory((short) 0x3000, new String[] {
+                "0111010111000010", // STR R2, R7, 3
+        });
+        CPU c = new CPU(mem, (short) 0x3000);
+        c.setRegister(2, (short) -123);
+        c.setRegister(7, (short) 0x5F00);
+        c.step();
+        Assert.assertEquals(-123, mem.getShort((short) 0x5F02));
+
+    }
 }
