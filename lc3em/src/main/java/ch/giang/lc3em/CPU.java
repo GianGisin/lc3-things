@@ -238,7 +238,6 @@ public class CPU {
                 newaddr = mem.getShort(pointer);
                 if (checkAccess(newaddr) && checkAccess(pointer)) {
                     mem.set(newaddr, RF[DR]);
-                    setConditionCodes(RF[DR]);
                 } else {
                     System.out.println("Access Control Violation at PC " + PC);
                     initiateException(LC3Exception.AccesControlViolation);
@@ -260,7 +259,6 @@ public class CPU {
                 newaddr = (short) (RF[BaseR] + offset6);
                 if (checkAccess(newaddr)) {
                     mem.set(newaddr, RF[DR]);
-                    setConditionCodes(RF[DR]);
                 } else {
                     System.out.println("Access Control Violation at PC " + PC);
                     initiateException(LC3Exception.AccesControlViolation);
